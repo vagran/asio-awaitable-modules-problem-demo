@@ -1,21 +1,21 @@
+#ifdef MODULES
 export module main;
 
-import callback;
 import <iostream>;
 
-export int
+#else
+
+#include <iostream>
+
+#endif
+
+#ifdef MODULES
+export
+#endif
+int
 main()
 {
-    Callback cbk1([&]() {
-        std::cout << "callback 1\n";
-    });
-
-    Callback cbk2([&]() {
-        std::cout << "callback 2\n";
-    });
-
-    cbk1();
-    cbk2();
-
+    ([](){ std::cout << "callback 1\n"; })();
+    ([](){ std::cout << "callback 2\n"; })();
     return 0;
 }
