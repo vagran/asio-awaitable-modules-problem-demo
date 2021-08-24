@@ -1,9 +1,10 @@
+module call;
+
 import callback;
-import call;
 import <iostream>;
 
-int
-main()
+void
+TestCall()
 {
     Callback cbk1([&]() {
         std::cout << "callback 1\n";
@@ -15,8 +16,4 @@ main()
 
     cbk1();
     cbk2();
-
-    TestCall();
-
-    return 0;
 }
