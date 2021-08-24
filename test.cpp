@@ -1,72 +1,21 @@
-#ifdef MODULES
-
-module;
-
-#include <signal.h>
-
 export module main;
 
-import asio;
+import callback;
 import <iostream>;
 
-#else
-
-#include <signal.h>
-#include <iostream>
-#include <asio/awaitable.hpp>
-#include <asio/signal_set.hpp>
-#include <asio/use_awaitable.hpp>
-#include <asio/co_spawn.hpp>
-
-#endif
-
-asio::awaitable<void>
-MainTask()
-{
-    std::cout << "In main task\n";
-    co_return;
-}
-
-#ifdef MODULES
-export
-#endif
-int
+export int
 main()
 {
-    asio::io_context mainCtx;
-    int exitCode = 0;
-
-    asio::signal_set signals(mainCtx, SIGINT, SIGTERM, SIGUSR1);
-    asio::co_spawn(mainCtx, [&]() -> asio::awaitable<void> {
-        while (true) {
-            std::cout << "waiting signal\n";
-            int sig = co_await signals.async_wait(asio::use_awaitable);
-            if (sig == SIGINT || sig == SIGTERM) {
-                std::cout << "Exiting on signal " << sig << "\n";
-                mainCtx.stop();
-                exitCode = 1;
-                break;
-            }
-            std::cout << "Signal received: " << sig << "\n";
-        }
-    }, [&](std::exception_ptr error) {
-        if (error) {
-            std::cout << "signal error\n";
-        }
-        std::cout << "signal completed\n";
+    Callback cbk1([&]() {
+        std::cout << "callback 1\n";
     });
 
-    asio::co_spawn(mainCtx, MainTask(),
-        [&](std::exception_ptr error) {
-
-        if (error) {
-            std::cout << "main error\n";
-        }
-        std::cout << "main complete\n";
-        mainCtx.stop();
+    Callback cbk2([&]() {
+        std::cout << "callback 2\n";
     });
 
-    mainCtx.run();
+    cbk1();
+    cbk2();
 
-    return exitCode;
+    return 0;
 }
