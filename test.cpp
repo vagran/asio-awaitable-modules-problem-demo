@@ -27,13 +27,34 @@ MainTask()
     co_return;
 }
 
+asio::io_context mainCtx;
+
+void
+OnSignalComplete(std::exception_ptr error)
+{
+    if (error) {
+        std::cout << "signal error\n";
+    }
+    std::cout << "signal completed\n";
+}
+
+void
+OnMainComplete(std::exception_ptr error)
+{
+    if (error) {
+        std::cout << "main error\n";
+    }
+    std::cout << "main complete\n";
+    mainCtx.stop();
+}
+
 #ifdef MODULES
 export
 #endif
 int
 main()
 {
-    asio::io_context mainCtx;
+
     int exitCode = 0;
 
     asio::signal_set signals(mainCtx, SIGINT, SIGTERM, SIGUSR1);
@@ -49,22 +70,9 @@ main()
             }
             std::cout << "Signal received: " << sig << "\n";
         }
-    }, [&](std::exception_ptr error) {
-        if (error) {
-            std::cout << "signal error\n";
-        }
-        std::cout << "signal completed\n";
-    });
+    }, OnSignalComplete);
 
-    asio::co_spawn(mainCtx, MainTask(),
-        [&](std::exception_ptr error) {
-
-        if (error) {
-            std::cout << "main error\n";
-        }
-        std::cout << "main complete\n";
-        mainCtx.stop();
-    });
+    asio::co_spawn(mainCtx, MainTask(), OnMainComplete);
 
     mainCtx.run();
 
