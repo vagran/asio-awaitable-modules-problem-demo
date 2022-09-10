@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "*.cppm": "cpp",
+        "future": "cpp",
+        "thread": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "*.ipp": "cpp"
+    },
+
+    "clangd.path": "/opt/clang-latest/bin/clangd",
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build",
+        "--clang-tidy",
+        "--log=verbose"
+    ]
+}
