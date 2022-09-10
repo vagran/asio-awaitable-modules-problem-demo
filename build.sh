@@ -2,7 +2,7 @@
 
 set -ev
 
-CXX="/home/artyom/tmp/llvm-install/bin/clang++"
+CXX="/opt/clang-latest/bin/clang++"
 
 CXX_FLAGS="-std=c++20 -stdlib=libc++ -Wall -Werror -g -O0"
 CXX_FLAGS="$CXX_FLAGS -fmodules -fimplicit-modules -fmodules-cache-path=modules-cache -DMODULES -fretain-comments-from-system-headers"
