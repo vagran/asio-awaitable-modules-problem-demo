@@ -5,7 +5,7 @@ set -ev
 CXX="/opt/clang-latest/bin/clang++"
 
 CXX_FLAGS="-std=c++20 -stdlib=libc++ -Wall -Werror -g -O0"
-CXX_FLAGS="$CXX_FLAGS -fmodules -fimplicit-modules -fmodules-cache-path=modules-cache -DMODULES -fretain-comments-from-system-headers"
+CXX_FLAGS="$CXX_FLAGS -fmodules -fmodules-cache-path=modules-cache -DMODULES -fretain-comments-from-system-headers"
 CXXM_FLAGS="$CXX_FLAGS --precompile -x c++-module"
 
 DIR=$(pwd)
@@ -24,22 +24,26 @@ dbEntry() {
 }
 
 echo "[" > $COMP_DB
-
 inFile="../a.cppm"
 outFile="a.pcm"
 cmd="$CXX -c $CXXM_FLAGS $inFile -o $outFile -Xclang -emit-module-interface"
-
 dbEntry "$cmd" $inFile $outFile >> $COMP_DB
-
 $cmd
 
 inFile="../a.cpp"
 outFile="a.o"
 cmd="$CXX -c $CXX_FLAGS -fmodule-file=a.pcm $inFile -o $outFile"
-
 echo "," >> $COMP_DB
 dbEntry "$cmd" $inFile $outFile >> $COMP_DB
+$cmd
 
-# $CXX $CXX_FLAGS a.o a.pcm -o test_mod
+inFile="../b.cppm"
+outFile="b.pcm"
+cmd="$CXX -c $CXXM_FLAGS -fmodule-file=a.pcm $inFile -o $outFile -Xclang -emit-module-interface"
+echo "," >> $COMP_DB
+dbEntry "$cmd" $inFile $outFile >> $COMP_DB
+$cmd
 
 echo "]" >> $COMP_DB
+
+$CXX $CXX_FLAGS a.o a.pcm b.pcm -o test_mod

@@ -1,6 +1,7 @@
 module A;
 
-void
+int
 TestFunc()
 {
+    return 42;
 }
